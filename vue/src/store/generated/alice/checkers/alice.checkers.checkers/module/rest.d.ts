@@ -1,3 +1,6 @@
+export interface CheckersMsgCreateGameResponse {
+    idValue?: string;
+}
 export declare type CheckersMsgCreatePostResponse = object;
 export interface CheckersNextGame {
     /** @format uint64 */
