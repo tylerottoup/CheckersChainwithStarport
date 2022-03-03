@@ -3,7 +3,8 @@ import { txClient, queryClient, MissingWalletError, registry } from './module';
 import { SpVuexError } from '@starport/vuex';
 import { NextGame } from "./module/types/checkers/next_game";
 import { Params } from "./module/types/checkers/params";
-export { NextGame, Params };
+import { StoredGame } from "./module/types/checkers/stored_game";
+export { NextGame, Params, StoredGame };
 async function initTxClient(vuexGetters) {
     return await txClient(vuexGetters['common/wallet/signer'], {
         addr: vuexGetters['common/env/apiTendermint']
@@ -39,9 +40,12 @@ const getDefaultState = () => {
     return {
         Params: {},
         NextGame: {},
+        StoredGame: {},
+        StoredGameAll: {},
         _Structure: {
             NextGame: getStructure(NextGame.fromPartial({})),
             Params: getStructure(Params.fromPartial({})),
+            StoredGame: getStructure(StoredGame.fromPartial({})),
         },
         _Registry: registry,
         _Subscriptions: new Set(),
@@ -78,6 +82,18 @@ export default {
                 params.query = null;
             }
             return state.NextGame[JSON.stringify(params)] ?? {};
+        },
+        getStoredGame: (state) => (params = { params: {} }) => {
+            if (!params.query) {
+                params.query = null;
+            }
+            return state.StoredGame[JSON.stringify(params)] ?? {};
+        },
+        getStoredGameAll: (state) => (params = { params: {} }) => {
+            if (!params.query) {
+                params.query = null;
+            }
+            return state.StoredGameAll[JSON.stringify(params)] ?? {};
         },
         getTypeStructure: (state) => (type) => {
             return state._Structure[type].fields;
@@ -138,6 +154,38 @@ export default {
             }
             catch (e) {
                 throw new SpVuexError('QueryClient:QueryNextGame', 'API Node Unavailable. Could not perform query: ' + e.message);
+            }
+        },
+        async QueryStoredGame({ commit, rootGetters, getters }, { options: { subscribe, all } = { subscribe: false, all: false }, params, query = null }) {
+            try {
+                const key = params ?? {};
+                const queryClient = await initQueryClient(rootGetters);
+                let value = (await queryClient.queryStoredGame(key.index)).data;
+                commit('QUERY', { query: 'StoredGame', key: { params: { ...key }, query }, value });
+                if (subscribe)
+                    commit('SUBSCRIBE', { action: 'QueryStoredGame', payload: { options: { all }, params: { ...key }, query } });
+                return getters['getStoredGame']({ params: { ...key }, query }) ?? {};
+            }
+            catch (e) {
+                throw new SpVuexError('QueryClient:QueryStoredGame', 'API Node Unavailable. Could not perform query: ' + e.message);
+            }
+        },
+        async QueryStoredGameAll({ commit, rootGetters, getters }, { options: { subscribe, all } = { subscribe: false, all: false }, params, query = null }) {
+            try {
+                const key = params ?? {};
+                const queryClient = await initQueryClient(rootGetters);
+                let value = (await queryClient.queryStoredGameAll(query)).data;
+                while (all && value.pagination && value.pagination.next_key != null) {
+                    let next_values = (await queryClient.queryStoredGameAll({ ...query, 'pagination.key': value.pagination.next_key })).data;
+                    value = mergeResults(value, next_values);
+                }
+                commit('QUERY', { query: 'StoredGameAll', key: { params: { ...key }, query }, value });
+                if (subscribe)
+                    commit('SUBSCRIBE', { action: 'QueryStoredGameAll', payload: { options: { all }, params: { ...key }, query } });
+                return getters['getStoredGameAll']({ params: { ...key }, query }) ?? {};
+            }
+            catch (e) {
+                throw new SpVuexError('QueryClient:QueryStoredGameAll', 'API Node Unavailable. Could not perform query: ' + e.message);
             }
         },
         async sendMsgCreatePost({ rootGetters }, { value, fee = [], memo = '' }) {

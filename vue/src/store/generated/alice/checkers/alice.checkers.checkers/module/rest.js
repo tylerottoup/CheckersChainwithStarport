@@ -164,5 +164,34 @@ export class Api extends HttpClient {
             format: "json",
             ...params,
         });
+        /**
+         * No description
+         *
+         * @tags Query
+         * @name QueryStoredGameAll
+         * @summary Queries a list of StoredGame items.
+         * @request GET:/alice/checkers/checkers/stored_game
+         */
+        this.queryStoredGameAll = (query, params = {}) => this.request({
+            path: `/alice/checkers/checkers/stored_game`,
+            method: "GET",
+            query: query,
+            format: "json",
+            ...params,
+        });
+        /**
+         * No description
+         *
+         * @tags Query
+         * @name QueryStoredGame
+         * @summary Queries a StoredGame by index.
+         * @request GET:/alice/checkers/checkers/stored_game/{index}
+         */
+        this.queryStoredGame = (index, params = {}) => this.request({
+            path: `/alice/checkers/checkers/stored_game/${index}`,
+            method: "GET",
+            format: "json",
+            ...params,
+        });
     }
 }
