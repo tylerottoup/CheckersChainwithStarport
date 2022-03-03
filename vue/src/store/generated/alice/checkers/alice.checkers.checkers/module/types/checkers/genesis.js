@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { Params } from "../checkers/params";
+import { NextGame } from "../checkers/next_game";
 import { Writer, Reader } from "protobufjs/minimal";
 export const protobufPackage = "alice.checkers.checkers";
 const baseGenesisState = {};
@@ -7,6 +8,9 @@ export const GenesisState = {
     encode(message, writer = Writer.create()) {
         if (message.params !== undefined) {
             Params.encode(message.params, writer.uint32(10).fork()).ldelim();
+        }
+        if (message.nextGame !== undefined) {
+            NextGame.encode(message.nextGame, writer.uint32(18).fork()).ldelim();
         }
         return writer;
     },
@@ -19,6 +23,9 @@ export const GenesisState = {
             switch (tag >>> 3) {
                 case 1:
                     message.params = Params.decode(reader, reader.uint32());
+                    break;
+                case 2:
+                    message.nextGame = NextGame.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -35,12 +42,22 @@ export const GenesisState = {
         else {
             message.params = undefined;
         }
+        if (object.nextGame !== undefined && object.nextGame !== null) {
+            message.nextGame = NextGame.fromJSON(object.nextGame);
+        }
+        else {
+            message.nextGame = undefined;
+        }
         return message;
     },
     toJSON(message) {
         const obj = {};
         message.params !== undefined &&
             (obj.params = message.params ? Params.toJSON(message.params) : undefined);
+        message.nextGame !== undefined &&
+            (obj.nextGame = message.nextGame
+                ? NextGame.toJSON(message.nextGame)
+                : undefined);
         return obj;
     },
     fromPartial(object) {
@@ -50,6 +67,12 @@ export const GenesisState = {
         }
         else {
             message.params = undefined;
+        }
+        if (object.nextGame !== undefined && object.nextGame !== null) {
+            message.nextGame = NextGame.fromPartial(object.nextGame);
+        }
+        else {
+            message.nextGame = undefined;
         }
         return message;
     },

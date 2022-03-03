@@ -1,5 +1,6 @@
 import { Reader, Writer } from "protobufjs/minimal";
 import { Params } from "../checkers/params";
+import { NextGame } from "../checkers/next_game";
 export declare const protobufPackage = "alice.checkers.checkers";
 /** QueryParamsRequest is request type for the Query/Params RPC method. */
 export interface QueryParamsRequest {
@@ -8,6 +9,11 @@ export interface QueryParamsRequest {
 export interface QueryParamsResponse {
     /** params holds all the parameters of this module. */
     params: Params | undefined;
+}
+export interface QueryGetNextGameRequest {
+}
+export interface QueryGetNextGameResponse {
+    NextGame: NextGame | undefined;
 }
 export declare const QueryParamsRequest: {
     encode(_: QueryParamsRequest, writer?: Writer): Writer;
@@ -23,15 +29,32 @@ export declare const QueryParamsResponse: {
     toJSON(message: QueryParamsResponse): unknown;
     fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse;
 };
+export declare const QueryGetNextGameRequest: {
+    encode(_: QueryGetNextGameRequest, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): QueryGetNextGameRequest;
+    fromJSON(_: any): QueryGetNextGameRequest;
+    toJSON(_: QueryGetNextGameRequest): unknown;
+    fromPartial(_: DeepPartial<QueryGetNextGameRequest>): QueryGetNextGameRequest;
+};
+export declare const QueryGetNextGameResponse: {
+    encode(message: QueryGetNextGameResponse, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): QueryGetNextGameResponse;
+    fromJSON(object: any): QueryGetNextGameResponse;
+    toJSON(message: QueryGetNextGameResponse): unknown;
+    fromPartial(object: DeepPartial<QueryGetNextGameResponse>): QueryGetNextGameResponse;
+};
 /** Query defines the gRPC querier service. */
 export interface Query {
     /** Parameters queries the parameters of the module. */
     Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
+    /** Queries a NextGame by index. */
+    NextGame(request: QueryGetNextGameRequest): Promise<QueryGetNextGameResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
     constructor(rpc: Rpc);
     Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
+    NextGame(request: QueryGetNextGameRequest): Promise<QueryGetNextGameResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

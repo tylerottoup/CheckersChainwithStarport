@@ -140,6 +140,20 @@ export class Api extends HttpClient {
          * No description
          *
          * @tags Query
+         * @name QueryNextGame
+         * @summary Queries a NextGame by index.
+         * @request GET:/alice/checkers/checkers/next_game
+         */
+        this.queryNextGame = (params = {}) => this.request({
+            path: `/alice/checkers/checkers/next_game`,
+            method: "GET",
+            format: "json",
+            ...params,
+        });
+        /**
+         * No description
+         *
+         * @tags Query
          * @name QueryParams
          * @summary Parameters queries the parameters of the module.
          * @request GET:/alice/checkers/checkers/params

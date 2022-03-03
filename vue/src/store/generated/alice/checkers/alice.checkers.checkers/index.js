@@ -1,8 +1,9 @@
 import { txClient, queryClient, MissingWalletError, registry } from './module';
 // @ts-ignore
 import { SpVuexError } from '@starport/vuex';
+import { NextGame } from "./module/types/checkers/next_game";
 import { Params } from "./module/types/checkers/params";
-export { Params };
+export { NextGame, Params };
 async function initTxClient(vuexGetters) {
     return await txClient(vuexGetters['common/wallet/signer'], {
         addr: vuexGetters['common/env/apiTendermint']
@@ -37,7 +38,9 @@ function getStructure(template) {
 const getDefaultState = () => {
     return {
         Params: {},
+        NextGame: {},
         _Structure: {
+            NextGame: getStructure(NextGame.fromPartial({})),
             Params: getStructure(Params.fromPartial({})),
         },
         _Registry: registry,
@@ -69,6 +72,12 @@ export default {
                 params.query = null;
             }
             return state.Params[JSON.stringify(params)] ?? {};
+        },
+        getNextGame: (state) => (params = { params: {} }) => {
+            if (!params.query) {
+                params.query = null;
+            }
+            return state.NextGame[JSON.stringify(params)] ?? {};
         },
         getTypeStructure: (state) => (type) => {
             return state._Structure[type].fields;
@@ -115,6 +124,20 @@ export default {
             }
             catch (e) {
                 throw new SpVuexError('QueryClient:QueryParams', 'API Node Unavailable. Could not perform query: ' + e.message);
+            }
+        },
+        async QueryNextGame({ commit, rootGetters, getters }, { options: { subscribe, all } = { subscribe: false, all: false }, params, query = null }) {
+            try {
+                const key = params ?? {};
+                const queryClient = await initQueryClient(rootGetters);
+                let value = (await queryClient.queryNextGame()).data;
+                commit('QUERY', { query: 'NextGame', key: { params: { ...key }, query }, value });
+                if (subscribe)
+                    commit('SUBSCRIBE', { action: 'QueryNextGame', payload: { options: { all }, params: { ...key }, query } });
+                return getters['getNextGame']({ params: { ...key }, query }) ?? {};
+            }
+            catch (e) {
+                throw new SpVuexError('QueryClient:QueryNextGame', 'API Node Unavailable. Could not perform query: ' + e.message);
             }
         },
         async sendMsgCreatePost({ rootGetters }, { value, fee = [], memo = '' }) {

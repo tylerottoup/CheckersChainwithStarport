@@ -1,10 +1,12 @@
 import { Params } from "../checkers/params";
+import { NextGame } from "../checkers/next_game";
 import { Writer, Reader } from "protobufjs/minimal";
 export declare const protobufPackage = "alice.checkers.checkers";
 /** GenesisState defines the checkers module's genesis state. */
 export interface GenesisState {
-    /** this line is used by starport scaffolding # genesis/proto/state */
     params: Params | undefined;
+    /** this line is used by starport scaffolding # genesis/proto/state */
+    nextGame: NextGame | undefined;
 }
 export declare const GenesisState: {
     encode(message: GenesisState, writer?: Writer): Writer;

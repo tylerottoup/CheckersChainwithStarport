@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { Reader, Writer } from "protobufjs/minimal";
 import { Params } from "../checkers/params";
+import { NextGame } from "../checkers/next_game";
 export const protobufPackage = "alice.checkers.checkers";
 const baseQueryParamsRequest = {};
 export const QueryParamsRequest = {
@@ -86,6 +87,104 @@ export const QueryParamsResponse = {
         return message;
     },
 };
+const baseQueryGetNextGameRequest = {};
+export const QueryGetNextGameRequest = {
+    encode(_, writer = Writer.create()) {
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof Uint8Array ? new Reader(input) : input;
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = {
+            ...baseQueryGetNextGameRequest,
+        };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(_) {
+        const message = {
+            ...baseQueryGetNextGameRequest,
+        };
+        return message;
+    },
+    toJSON(_) {
+        const obj = {};
+        return obj;
+    },
+    fromPartial(_) {
+        const message = {
+            ...baseQueryGetNextGameRequest,
+        };
+        return message;
+    },
+};
+const baseQueryGetNextGameResponse = {};
+export const QueryGetNextGameResponse = {
+    encode(message, writer = Writer.create()) {
+        if (message.NextGame !== undefined) {
+            NextGame.encode(message.NextGame, writer.uint32(10).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof Uint8Array ? new Reader(input) : input;
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = {
+            ...baseQueryGetNextGameResponse,
+        };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.NextGame = NextGame.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = {
+            ...baseQueryGetNextGameResponse,
+        };
+        if (object.NextGame !== undefined && object.NextGame !== null) {
+            message.NextGame = NextGame.fromJSON(object.NextGame);
+        }
+        else {
+            message.NextGame = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.NextGame !== undefined &&
+            (obj.NextGame = message.NextGame
+                ? NextGame.toJSON(message.NextGame)
+                : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = {
+            ...baseQueryGetNextGameResponse,
+        };
+        if (object.NextGame !== undefined && object.NextGame !== null) {
+            message.NextGame = NextGame.fromPartial(object.NextGame);
+        }
+        else {
+            message.NextGame = undefined;
+        }
+        return message;
+    },
+};
 export class QueryClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
@@ -94,5 +193,10 @@ export class QueryClientImpl {
         const data = QueryParamsRequest.encode(request).finish();
         const promise = this.rpc.request("alice.checkers.checkers.Query", "Params", data);
         return promise.then((data) => QueryParamsResponse.decode(new Reader(data)));
+    }
+    NextGame(request) {
+        const data = QueryGetNextGameRequest.encode(request).finish();
+        const promise = this.rpc.request("alice.checkers.checkers.Query", "NextGame", data);
+        return promise.then((data) => QueryGetNextGameResponse.decode(new Reader(data)));
     }
 }
